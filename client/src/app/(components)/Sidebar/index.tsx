@@ -4,7 +4,19 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import Image from "next/image";
-import { Home, LockIcon, LucideIcon, X } from "lucide-react";
+import {
+  Briefcase,
+  ChevronDown,
+  ChevronUp,
+  Home,
+  LockIcon,
+  LucideIcon,
+  Search,
+  Settings,
+  User,
+  Users,
+  X,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { Icon } from "lucide-react";
@@ -12,7 +24,7 @@ import { setIsSidebarCollapsed } from "@/state";
 
 const index = () => {
   const [showProjects, setShowProjects] = useState(true);
-  const [showPriority, useStatePriority] = useState(true);
+  const [showPriority, setShowPriority] = useState(true);
 
   const dispatch = useAppDispatch();
   const isSidebarCollapsed = useAppSelector(
@@ -56,7 +68,36 @@ const index = () => {
         {/* Narvbar Links */}
         <nav className="z-10 w-full">
           <SidebarLink icon={Home} label="Home" href="/" />
+          <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
+          <SidebarLink icon={Search} label="Search" href="/search" />
+          <SidebarLink icon={Settings} label="Settings" href="/settings" />
+          <SidebarLink icon={User} label="Users" href="/users" />
+          <SidebarLink icon={Users} label="Team" href="/teams" />
         </nav>
+        {/* Projects Links */}
+        <button
+          onClick={() => setShowProjects((prev) => !prev)}
+          className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
+        >
+          <span className="">Projects</span>
+          {showProjects ? (
+            <ChevronUp className="h-4 w-5" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </button>
+        {/* Priorities Links */}
+        <button
+          onClick={() => setShowPriority((prev) => !prev)}
+          className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
+        >
+          <span className="">Priority</span>
+          {showPriority ? (
+            <ChevronUp className="h-4 w-5" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </button>
       </div>
     </div>
   );
