@@ -1,18 +1,25 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import Link from "next/link";
 import React, { useState } from "react";
 import Image from "next/image";
-import { Home, LockIcon, LucideIcon } from "lucide-react";
+import { Home, LockIcon, LucideIcon, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { Icon } from "lucide-react";
+import { setIsSidebarCollapsed } from "@/state";
 
 const index = () => {
-  // const [showProjects, setShowProjects] = useState(true);
-  // const [showPriority, useStatePriority] = useState(true);
+  const [showProjects, setShowProjects] = useState(true);
+  const [showPriority, useStatePriority] = useState(true);
 
-  const sideBarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white w-64`;
+  const dispatch = useAppDispatch();
+  const isSidebarCollapsed = useAppSelector(
+    (state) => state.global.isSidebarCollapsed,
+  );
+
+  const sideBarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}`;
 
   return (
     <div className={sideBarClassNames}>
@@ -22,6 +29,16 @@ const index = () => {
           <div className="text-xl font-bold text-gray-800 dark:text-white">
             EDLIST
           </div>
+          {isSidebarCollapsed ? null : (
+            <button
+              className="py-3"
+              onClick={() => {
+                dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
+              }}
+            >
+              <X className="h-6 w-6 text-gray-800 hover:text-gray-500 dark:text-white" />
+            </button>
+          )}
         </div>
         {/* Team */}
         <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
