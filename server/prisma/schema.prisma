@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -41,8 +42,8 @@ model Project {
   id           Int           @id @default(autoincrement())
   name         String
   description  String?
-  startDate    DateTime
-  endDate      DateTime
+  startDate    DateTime?
+  endDate      DateTime?
   tasks        Task[]
   projectTeams ProjectTeam[]
 }
@@ -63,7 +64,7 @@ model Task {
   priority       String?
   tags           String?
   startDate      DateTime?
-  endDate        DateTime?
+  dueDate        DateTime?
   points         Int?
   projectId      Int
   authorUserId   Int
@@ -87,14 +88,14 @@ model TaskAssignment {
 }
 
 model Attachment {
-  id            Int     @id @default(autoincrement())
-  fileURL       String
-  fileName      String?
-  taskId        Int
-  upoloadedById Int
+  id           Int     @id @default(autoincrement())
+  fileURL      String
+  fileName     String?
+  taskId       Int
+  uploadedById Int
 
   task       Task @relation(fields: [taskId], references: [id])
-  uploadedBy User @relation(fields: [upoloadedById], references: [userId])
+  uploadedBy User @relation(fields: [uploadedById], references: [userId])
 }
 
 model Comment {
