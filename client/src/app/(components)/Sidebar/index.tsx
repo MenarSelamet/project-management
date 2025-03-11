@@ -77,7 +77,7 @@ const index = () => {
           <SidebarLink icon={Search} label="Search" href="/search" />
           <SidebarLink icon={Settings} label="Settings" href="/settings" />
           <SidebarLink icon={User} label="Users" href="/users" />
-          <SidebarLink icon={Users} label="Team" href="/teams" />
+          <SidebarLink icon={Users} label="Teams" href="/teams" />
         </nav>
         {/* Projects Links */}
         <button
