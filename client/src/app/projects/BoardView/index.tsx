@@ -205,6 +205,11 @@ const Task = ({ task }: TaskProps) => {
         </div>
         <div className="my-3 flex justify-between">
           <h4 className="text-md font-bold dark:text-white">{task.title}</h4>
+          {typeof task.points === "number" && (
+            <div className="text-xs font-semibold dark:text-white">
+              {task.points} pts
+            </div>
+          )}
         </div>
       </div>
     </div>
