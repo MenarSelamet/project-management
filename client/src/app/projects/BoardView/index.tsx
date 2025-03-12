@@ -6,6 +6,7 @@ import { Task as TaskType } from "@/state/api";
 import { EllipsisVertical, Plus } from "lucide-react";
 import { format } from "date-fns";
 import Image from "next/image";
+import { Span } from "next/dist/trace";
 
 type BoardProps = {
   id: string;
@@ -210,6 +211,11 @@ const Task = ({ task }: TaskProps) => {
               {task.points} pts
             </div>
           )}
+        </div>
+
+        <div className="text-xs text-gray-500 dark:text-neutral-500">
+          {formattedStartDate && <span>{formattedStartDate} - </span>}
+          {formattedDueDate && <span>{formattedDueDate}</span>}
         </div>
       </div>
     </div>
