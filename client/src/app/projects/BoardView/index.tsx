@@ -7,27 +7,26 @@ import { EllipsisVertical, Plus } from "lucide-react";
 import { format } from "date-fns";
 import Image from "next/image";
 
-type Props = {
+type BoardProps = {
   id: string;
   setIsModalNewTaskOpen: (isOpen: boolean) => void;
 };
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Completed"];
 
-const BoardView = ({ id, setIsModalNewTaskOpen }: Props) => {
+const BoardView = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
   const {
     data: tasks,
     isLoading,
     error,
   } = useGetTasksQuery({ projectId: Number(id) });
-
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
   const moveTask = (taskId: number, toStatus: string) => {
     updateTaskStatus({ taskId, status: toStatus });
   };
 
-  if (isLoading) return <div>Loading ...</div>;
+  if (isLoading) return <div>Loading...</div>;
   if (error) return <div>An error occurred while fetching tasks</div>;
 
   return (
@@ -71,7 +70,8 @@ const TaskColumn = ({
 
   const tasksCount = tasks.filter((task) => task.status === status).length;
 
-  const statusColor: Record<string, string> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const statusColor: any = {
     "To Do": "#2563EB",
     "Work In Progress": "#059669",
     "Under Review": "#D97706",
@@ -83,16 +83,14 @@ const TaskColumn = ({
       ref={(instance) => {
         drop(instance);
       }}
-      className={`sl:py-4 rounded-lg py-2 xl:px-2 ${
-        isOver ? "bg-blue-100 dark:bg-neutral-950" : ""
-      }`}
+      className={`sl:py-4 rounded-lg py-2 xl:px-2 ${isOver ? "bg-blue-100 dark:bg-neutral-950" : ""}`}
     >
       <div className="mb-3 flex w-full">
         <div
-          className="w-2 rounded-s-lg"
+          className="rounded-s-large w-2"
           style={{ backgroundColor: statusColor[status] }}
         />
-        <div className="bg:white dark:bg-dark-secondary flex w-full items-center justify-between rounded-e-lg px-5 py-4">
+        <div className="dark:bg-dark-secondary flex w-full items-center justify-between rounded-e-lg bg-white px-5 py-4">
           <h3 className="flex items-center text-lg font-semibold dark:text-white">
             {status}{" "}
             <span
@@ -144,7 +142,6 @@ const Task = ({ task }: TaskProps) => {
   const formattedStartDate = task.startDate
     ? format(new Date(task.startDate), "P")
     : "";
-
   const formattedDueDate = task.dueDate
     ? format(new Date(task.dueDate), "P")
     : "";
@@ -153,7 +150,17 @@ const Task = ({ task }: TaskProps) => {
 
   const PriorityTag = ({ priority }: { priority: TaskType["priority"] }) => (
     <div
-      className={`rounded-full px-2 py-1 text-xs font-semibold ${priority === "Urgent" ? "bg-red-200 text-red-700" : priority === "High" ? "bg-yellow-200 text-yellow-700" : priority === "Medium" ? "bg-green-200 text-green-700" : priority === "Low" ? "bg-blue-200 text-blue-700" : "bg-gray-200 text-gray-700"}`}
+      className={`rounded-full px-2 py-1 text-xs font-semibold ${
+        priority === "Urgent"
+          ? "bg-red-200 text-red-700"
+          : priority === "High"
+            ? "bg-yellow-200 text-yellow-700"
+            : priority === "Medium"
+              ? "bg-green-200 text-green-700"
+              : priority === "Low"
+                ? "bg-blue-200 text-blue-700"
+                : "bg-gray-200 text-gray-700"
+      }`}
     >
       {priority}
     </div>
@@ -168,8 +175,14 @@ const Task = ({ task }: TaskProps) => {
         isDragging ? "opacity-50" : "opacity-100"
       }`}
     >
-      {task.attachments && task.attachments.length > 0  && (
-        <Image src={`/${task.attachments[0].fileURL}`} alt={task.attachments[0].fileName} width={400} height={200} className="h-auto w-full rounded-t-medium"/>
+      {task.attachments && task.attachments.length > 0 && (
+        <Image
+          src={`/${task.attachments[0].fileURL}`}
+          alt={task.attachments[0].fileName}
+          width={400}
+          height={200}
+          className="h-auto w-full rounded-t-md"
+        />
       )}
     </div>
   );
