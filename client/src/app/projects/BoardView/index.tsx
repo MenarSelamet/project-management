@@ -188,6 +188,16 @@ const Task = ({ task }: TaskProps) => {
         <div className="flex items-start justify-between">
           <div className="flex flex-1 flex-wrap items-center gap-2">
             {task.priority && <PriorityTag priority={task.priority} />}
+            <div className="flex gap-2">
+              {taskTagsSplit.map((tag) => (
+                <div
+                  key={tag}
+                  className="rounded-full bg-blue-100 px-2 py-1 text-xs"
+                >
+                  {tag}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
