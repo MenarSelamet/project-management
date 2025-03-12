@@ -68,20 +68,35 @@ const TaskColumn = ({
 
   const tasksCount = tasks.filter((task) => task.status === status).length;
 
-  const statusColor: any = {
+  const statusColor: Record<string, string> = {
     "To Do": "#2563EB",
     "Work In Progress": "#059669",
     "Under Review": "#D97706",
     Completed: "#000000",
   };
 
-
-
-
-
-
-
-  
+  return (
+    <div
+      ref={(instance) => {
+        drop(instance);
+      }}
+      className={`sl:py-4 rounded-lg py-2 xl:px-2 ${
+        isOver ? "bg-blue-100 dark:bg-neutral-950" : ""
+      }`}
+    >
+      <div className="mb-3 flex w-full">
+        <div
+          className="w-2 rounded-s-lg"
+          style={{ backgroundColor: statusColor[status] }}
+        />
+        <div className="bg:white dark:bg-dark-secondary flex w-full items-center justify-between rounded-e-lg px-5 py-4">
+          <h3 className="flex items-center text-lg font-semibold dark:text-white">
+            {status}{" "}
+          </h3>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default BoardView;
