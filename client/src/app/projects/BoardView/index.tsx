@@ -199,6 +199,12 @@ const Task = ({ task }: TaskProps) => {
               ))}
             </div>
           </div>
+          <button className="flex h-6 w-4 flex-shrink-0 items-center justify-center dark:text-neutral-500">
+            <EllipsisVertical size={26} />
+          </button>
+        </div>
+        <div className="my-3 flex justify-between">
+          <h4 className="text-md font-bold dark:text-white">{task.title}</h4>
         </div>
       </div>
     </div>
