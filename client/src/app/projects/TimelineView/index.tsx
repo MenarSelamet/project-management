@@ -25,7 +25,7 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
   });
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>An error occured while fetching tasks</div>;
+  if (error || !tasks) return <div>An error occured while fetching tasks</div>;
 
   const ganttTasks = useMemo(() => {
     return (
