@@ -40,8 +40,35 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
     );
   }, [tasks]);
 
+  const handleViewModeChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    setDisplayOptions((prev) => ({
+      ...prev,
+      viewMode: event.target.value as ViewMode,
+    }));
+  };
 
-  return <div>Timeline</div>;
+  return (
+    <div className="px-4 xl:px-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 py-5">
+        <h1 className="me-2 text-lg font-bold dark:text-white">
+          Project Tasks Timeline
+        </h1>
+        <div className="relative inline-block w-64">
+          <select
+            className="focus:shadow-outline dark:border-dark-secondary dark:bg-dark-secondary block w-full appearance-none rounded border border-gray-400 bg-white px-4 py-2 pr-8 leading-tight shadow hover:border-gray-500 focus:outline-none dark:text-white"
+            value={displayOptions.viewMode}
+            onChange={handleViewModeChange}
+          >
+            <option value={ViewMode.Day}>Day</option>
+            <option value={ViewMode.Week}>Week</option>
+            <option value={ViewMode.Month}>Month</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Timeline;
