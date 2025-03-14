@@ -10,10 +10,11 @@ type Props = {
 
 const ModalNewProject = ({ isOpen, onClose }: Props) => {
   const [createProject, { isLoading }] = useCreateProjectMutation();
-  const [projectName, setProjectName] = useState<string>();
-  const [description, setDescription] = useState<string>();
-  const [startDate, setStartDate] = useState<string>();
-  const [endDate, setEndDate] = useState<string>();
+  const [projectName, setProjectName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!projectName || !startDate || !endDate) return;
@@ -25,12 +26,31 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
       representation: "complete",
     });
 
-    await createProject({
-      name: projectName,
-      description,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
-    });
+    try {
+      await createProject({
+        name: projectName,
+        description,
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+      });
+
+      // Show success message
+      setSuccessMessage("Project added successfully! 🎉");
+
+      // Clear form fields
+      setProjectName("");
+      setDescription("");
+      setStartDate("");
+      setEndDate("");
+
+      // Hide success message after 3 seconds
+      setTimeout(() => setSuccessMessage(null), 3000);
+
+      // Optional: Close the modal after successful submission
+      setTimeout(() => onClose(), 2000); // Comment this out if you don't want auto-close
+    } catch (error) {
+      console.error("Error creating project:", error);
+    }
   };
 
   const isFormValid = () => {
@@ -42,6 +62,13 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} name="Create New Project">
+      {/* Success Message */}
+      {successMessage && (
+        <div className="mb-3 rounded bg-green-100 p-2 text-center text-green-800">
+          {successMessage}
+        </div>
+      )}
+
       <form
         className="mt-4 space-y-6"
         onSubmit={(e) => {
