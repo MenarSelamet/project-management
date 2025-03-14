@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ModalNewProject from "@/components/Modal";
+import ModalNewProject from "./ModalNewProject";
 import Header from "@/components/Header";
 import {
   Clock,
