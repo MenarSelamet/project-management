@@ -41,9 +41,9 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
       setStartDate("");
       setEndDate("");
 
-      setTimeout(() => setSuccessMessage(null), 3000);
+      // setTimeout(() => setSuccessMessage(null), 3000);
 
-      setTimeout(() => onClose(), 2000);
+      // setTimeout(() => onClose(), 2000);
     } catch (error) {
       console.error("Error creating project:", error);
     }
