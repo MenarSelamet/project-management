@@ -22,7 +22,7 @@ export const getTeams = async (req: Request, res: Response): Promise<void> => {
         return {
           ...team,
           productOwnerUsername: productOwner?.username,
-          projectMangerUsername: projectManager?.username,
+          projectManagerUsername: projectManager?.username,
         };
       })
     );
@@ -30,6 +30,6 @@ export const getTeams = async (req: Request, res: Response): Promise<void> => {
   } catch (error: any) {
     res
       .status(500)
-      .json({ message: `Error retrieving teams: ${error.message}` });
+      .json({ message: `Error retrieving Teams: ${error.message}` });
   }
 };
