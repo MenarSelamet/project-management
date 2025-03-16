@@ -179,7 +179,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
           <input
             type="text"
             className={inputStyles}
-            placeholder="ProjectId"
+            placeholder="Project ID"
             value={projectId}
             onChange={(e) => setProjectId(e.target.value)}
           />
