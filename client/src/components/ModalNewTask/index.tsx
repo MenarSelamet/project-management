@@ -9,7 +9,7 @@ type Props = {
   id?: string | null;
 };
 
-const ModalNewTask = ({ isOpen, onClose, id }: Props) => {
+const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -21,9 +21,11 @@ const ModalNewTask = ({ isOpen, onClose, id }: Props) => {
   const [startDate, setStartDate] = useState<string>("");
   const [dueDate, setDueDate] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [projectId, setProjectId] = useState("");
 
   const handleSubmit = async () => {
-    if (!title.trim() || !authorUserId.trim()) return;
+    if (!title.trim() || !authorUserId.trim() || !(id !== null || projectId))
+      return;
 
     if (!id) {
       console.error("Project ID is missing");
@@ -51,7 +53,7 @@ const ModalNewTask = ({ isOpen, onClose, id }: Props) => {
           : undefined,
         startDate: formattedStartDate,
         dueDate: formattedDueDate,
-        projectId: Number(id),
+        projectId: id !== null ? Number(id) : Number(projectId),
       });
 
       setSuccessMessage("Task added successfully! 🎉");
@@ -72,7 +74,11 @@ const ModalNewTask = ({ isOpen, onClose, id }: Props) => {
   };
 
   const isFormValid = () => {
-    return title.trim().length > 0 && authorUserId.trim().length > 0;
+    return (
+      title.trim().length > 0 &&
+      authorUserId.trim().length > 0 &&
+      !(id !== null || projectId)
+    );
   };
 
   const selectStyles =
@@ -169,6 +175,15 @@ const ModalNewTask = ({ isOpen, onClose, id }: Props) => {
           value={assignedUserId}
           onChange={(e) => setAssignedUserId(e.target.value)}
         />
+        {id === null && (
+          <input
+            type="text"
+            className={inputStyles}
+            placeholder="ProjectId"
+            value={projectId}
+            onChange={(e) => setProjectId(e.target.value)}
+          />
+        )}
         <button
           type="submit"
           className={`focus-offset-2 bg-blue-primary mt-4 flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none ${!isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""}`}
