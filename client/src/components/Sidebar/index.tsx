@@ -61,7 +61,12 @@ const index = () => {
         </div>
         {/* Team */}
         <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
-          <Image src="/logo.jpg" alt="Logo" width={40} height={40} />
+          <Image
+            src="https:://pms3images-ms.s3.us-east-1.amazonaws.com/logo.jpg"
+            alt="Logo"
+            width={40}
+            height={40}
+          />
           <div>
             <h3 className="text-md font-bold tracking-wide dark:text-gray-200">
               MENARS TEAM
