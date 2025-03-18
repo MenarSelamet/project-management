@@ -27,19 +27,16 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
   if (isLoading) return <div>Loading...</div>;
   if (error || !tasks) return <div>An error occured while fetching tasks</div>;
 
-  const ganttTasks = useMemo(() => {
-    return (
-      tasks?.map((task) => ({
-        start: new Date(task.startDate as string),
-        end: new Date(task.dueDate as string),
-        name: task.title,
-        id: `Task-${task.id}`,
-        type: "task" as TaskTypeItems,
-        progress: task.points ? (task.points / 10) * 100 : 0,
-        isDisabled: false,
-      })) || []
-    );
-  }, [tasks]);
+ const ganttTasks =
+   tasks?.map((task) => ({
+     start: new Date(task.startDate as string),
+     end: new Date(task.dueDate as string),
+     name: task.title,
+     id: `Task-${task.id}`,
+     type: "task" as TaskTypeItems,
+     progress: task.points ? (task.points / 10) * 100 : 0,
+     isDisabled: false,
+   })) || [];
 
   const handleViewModeChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
