@@ -19,17 +19,17 @@ const Timeline = () => {
   });
 
   const ganttTasks = useMemo(() => {
-    if (!projects) return [];
-
-    return projects.map((project) => ({
-      start: new Date(project.startDate as string),
-      end: new Date(project.endDate as string),
-      name: project.name,
-      id: `Project-${project.id}`,
-      type: "project" as TaskTypeItems,
-      progress: 50,
-      isDisabled: false,
-    }));
+    return projects
+      ? projects.map((project) => ({
+          start: new Date(project.startDate as string),
+          end: new Date(project.endDate as string),
+          name: project.name,
+          id: `Project-${project.id}`,
+          type: "project" as TaskTypeItems,
+          progress: 50,
+          isDisabled: false,
+        }))
+      : [];
   }, [projects]);
 
   const handleViewModeChange = (
