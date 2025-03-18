@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import { useGetProjectsQuery } from "@/state/api";
 import { DisplayOption, Gantt, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 
 type TaskTypeItems = "task" | "milestone" | "project";
 
@@ -18,19 +18,17 @@ const Timeline = () => {
     locale: "en-US",
   });
 
-  const ganttTasks = useMemo(() => {
-    return projects
-      ? projects.map((project) => ({
-          start: new Date(project.startDate as string),
-          end: new Date(project.endDate as string),
-          name: project.name,
-          id: `Project-${project.id}`,
-          type: "project" as TaskTypeItems,
-          progress: 50,
-          isDisabled: false,
-        }))
-      : [];
-  }, [projects]);
+ const ganttTasks = projects
+   ? projects.map((project) => ({
+       start: new Date(project.startDate as string),
+       end: new Date(project.endDate as string),
+       name: project.name,
+       id: `Project-${project.id}`,
+       type: "project" as TaskTypeItems,
+       progress: 50,
+       isDisabled: false,
+     }))
+   : [];
 
   const handleViewModeChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
