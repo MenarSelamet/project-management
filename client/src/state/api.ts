@@ -74,6 +74,14 @@ export interface Team {
   projectManagerUserId?: number;
 }
 
+export interface Comment {
+  // This interface was missing in the original code
+  id: number;
+  text: string;
+  taskId: number;
+  userId: number;
+}
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -117,6 +125,13 @@ export const api = createApi({
         url: "projects",
         method: "POST",
         body: project,
+      }),
+      invalidatesTags: ["Projects"],
+    }),
+    deleteProject: build.mutation<{ message: string }, string>({
+      query: (id) => ({
+        url: `projects/${id}`,
+        method: "DELETE",
       }),
       invalidatesTags: ["Projects"],
     }),
@@ -169,6 +184,7 @@ export const api = createApi({
 export const {
   useGetProjectsQuery,
   useCreateProjectMutation,
+  useDeleteProjectMutation,
   useGetTasksQuery,
   useCreateTaskMutation,
   useUpdateTaskStatusMutation,
