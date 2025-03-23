@@ -23,16 +23,23 @@ export const createProject = async (
 ): Promise<void> => {
   const { name, description, startDate, endDate } = req.body;
   try {
+    console.log('Creating project with data:', { name, description, startDate, endDate });
+    
+    // Reset the sequence if needed
+    await prisma.$executeRaw`SELECT setval('"Project_id_seq"', (SELECT MAX(id) FROM "Project"));`;
+    
     const newProject = await prisma.project.create({
       data: {
         name,
         description,
-        startDate,
-        endDate,
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null,
       },
     });
+    console.log('Project created successfully:', newProject);
     res.status(201).json(newProject);
   } catch (error: any) {
+    console.error('Error creating project:', error);
     res
       .status(500)
       .json({ message: `Error creating Project: ${error.message}` });
