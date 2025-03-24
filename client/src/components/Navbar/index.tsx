@@ -75,22 +75,24 @@ const Navbar = () => {
         </Link>
         <div className="mr-5 ml-2 hidden min-h-[2em] w-[0.1rem] bg-gray-200 md:inline-block"></div>
         <div className="hidden items-center justify-between md:flex">
-          <div className="align-center flex h-9 w-9 justify-center">
-            {!!currentUserDetails?.profilePictureUrl ? (
-              <Image
-                src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${currentUserDetails?.profilePictureUrl}`}
-                alt={currentUserDetails?.username || "User Profile Picture"}
-                width={100}
-                height={50}
-                className="h-full rounded-full object-cover"
-              />
-            ) : (
-              <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
-            )}
-          </div>
-          <span className="mx-3 text-gray-800 dark:text-white">
-            {currentUserDetails?.username}
-          </span>
+          <Link href="/profile" className="flex items-center hover:opacity-80">
+            <div className="align-center flex h-9 w-9 justify-center">
+              {!!currentUserDetails?.profilePictureUrl ? (
+                <Image
+                  src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${currentUserDetails?.profilePictureUrl}`}
+                  alt={currentUserDetails?.username || "User Profile Picture"}
+                  width={100}
+                  height={50}
+                  className="h-full rounded-full object-cover"
+                />
+              ) : (
+                <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
+              )}
+            </div>
+            <span className="mx-3 text-gray-800 dark:text-white">
+              {currentUserDetails?.username}
+            </span>
+          </Link>
           <button
             className="hidden rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"
             onClick={handleSignOut}
