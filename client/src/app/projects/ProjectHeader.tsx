@@ -2,10 +2,8 @@ import React from "react";
 import Header from "@/components/Header";
 import {
   Clock,
-  Filter,
   Grid3X3,
   List,
-  Share2,
   Table,
 } from "lucide-react";
 
@@ -51,22 +49,6 @@ const ProjectHeader = ({ activeTab, setActiveTab, projectName = "Project Managem
             setActiveTab={setActiveTab}
             activeTab={activeTab}
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <button className="text-gray-500 hover:text-gray-600 dark:text-neutral-500 dark:hover:text-gray-300">
-            <Filter className="h-5 w-5" />
-          </button>
-          <button className="text-gray-500 hover:text-gray-600 dark:text-neutral-500 dark:hover:text-gray-300">
-            <Share2 className="h-5 w-5" />
-          </button>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search Task"
-              className="dark:border-dark-secondary dark:bg-dark-secondary rounded-md border py-1 pr-4 pl-10 focus:outline-none dark:text-white"
-            />
-            <Grid3X3 className="absolute top-2 left-3 h-4 w-4 text-gray-400 dark:text-neutral-500" />
-          </div>
         </div>
       </div>
     </div>

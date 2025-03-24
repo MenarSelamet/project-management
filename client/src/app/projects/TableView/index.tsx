@@ -7,7 +7,6 @@ import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
 
 type Props = {
   id: string;
-  setIsModalNewTaskOpen: (isOpen: boolean) => void;
 };
 
 const columns: GridColDef[] = [
@@ -66,7 +65,7 @@ const columns: GridColDef[] = [
   },
 ];
 
-const TableView = ({ id, setIsModalNewTaskOpen }: Props) => {
+const TableView = ({ id }: Props) => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const {
     data: tasks,
@@ -83,14 +82,6 @@ const TableView = ({ id, setIsModalNewTaskOpen }: Props) => {
         <Header
           name="Table"
           isSmallText
-          buttonComponent={
-            <button
-              className="bg-blue-primary flex items-center rounded px-3 py-2 text-white hover:bg-blue-600"
-              onClick={() => setIsModalNewTaskOpen(true)}
-            >
-              Add Task
-            </button>
-          }
         />
       </div>
       <DataGrid

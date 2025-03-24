@@ -52,13 +52,13 @@ const Project = ({ params }: { params: Promise<{ id: string }> }) => {
         <Board id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
       )}
       {activeTab === "List" && (
-        <List id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+        <List id={id} />
       )}
       {activeTab === "Timeline" && (
         <Timeline id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
       )}
       {activeTab === "Table" && (
-        <Table id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+        <Table id={id} />
       )}
       <button
         onClick={() => setIsDeleteModalOpen(true)}
