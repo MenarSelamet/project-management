@@ -103,6 +103,3 @@ AWS_REGION=
 AWS_USER_POOL_ID=
 ```
 
-## License
-
-MIT
