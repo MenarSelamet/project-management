@@ -68,10 +68,14 @@ export interface SearchResults {
 }
 
 export interface Team {
-  teamId: number;
+  id: number;
   teamName: string;
   productOwnerUserId?: number;
   projectManagerUserId?: number;
+  productOwner?: User;
+  projectManager?: User;
+  members?: User[];
+  onEdit?: (team: Team) => void;
 }
 
 export interface Comment {
@@ -136,7 +140,7 @@ export const api = createApi({
       invalidatesTags: ["Projects"],
     }),
     getTasks: build.query<Task[], { projectId: number }>({
-      query: ({ projectId }) => `tasks?projectId=${projectId}`,
+      query: ({ projectId }) => `tasks?projectId=${projectId}&include=assignee`,
       providesTags: (result) =>
         result
           ? result.map(({ id }) => ({ type: "Tasks" as const, id }))

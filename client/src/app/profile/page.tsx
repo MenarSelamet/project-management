@@ -72,7 +72,7 @@ const ProfilePage = () => {
                   >
                     <option value="">Select a team</option>
                     {teams?.map((team) => (
-                      <option key={team.teamId} value={team.teamId}>
+                      <option key={team.id} value={team.id}>
                         {team.teamName}
                       </option>
                     ))}

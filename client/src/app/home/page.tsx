@@ -31,6 +31,15 @@ const taskColumns: GridColDef[] = [
   { field: "status", headerName: "Status", width: 150 },
   { field: "priority", headerName: "Priority", width: 150 },
   { field: "dueDate", headerName: "Due Date", width: 150 },
+  {
+    field: "assignee",
+    headerName: "Assigned To",
+    width: 180,
+    valueGetter: (params) => {
+      const task = params.row as Task;
+      return task?.assignee?.username || "Unassigned";
+    },
+  },
 ];
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
