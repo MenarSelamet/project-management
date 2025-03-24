@@ -47,7 +47,12 @@ const Project = ({ params }: { params: Promise<{ id: string }> }) => {
         title="Delete Project"
         message="Are you sure you want to delete this project? This action cannot be undone."
       />
-      <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} projectName={project?.name} />
+      <ProjectHeader 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        projectName={project?.name}
+        onAddTask={() => setIsModalNewTaskOpen(true)}
+      />
       {activeTab === "Board" && (
         <Board id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
       )}

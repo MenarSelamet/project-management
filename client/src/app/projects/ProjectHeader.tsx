@@ -5,20 +5,31 @@ import {
   Grid3X3,
   List,
   Table,
+  Plus,
 } from "lucide-react";
 
 type Props = {
   activeTab: string;
   setActiveTab: (tabName: string) => void;
   projectName?: string;
+  onAddTask: () => void;
 };
 
-const ProjectHeader = ({ activeTab, setActiveTab, projectName = "Project Management" }: Props) => {
+const ProjectHeader = ({ activeTab, setActiveTab, projectName = "Project Management", onAddTask }: Props) => {
   return (
     <div className="px-4 xl:px-6">
       <div className="pt-6 pb-6 lg:pt-8 lg:pb-4">
         <Header
           name={projectName === "Project Management" ? projectName : `Project ${projectName}`}
+          buttonComponent={
+            <button
+              onClick={onAddTask}
+              className="flex items-center gap-2 bg-blue-primary text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+            >
+              <Plus className="h-5 w-5" />
+              Add Task
+            </button>
+          }
         />
       </div>
 
