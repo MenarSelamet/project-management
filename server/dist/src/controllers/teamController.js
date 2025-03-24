@@ -9,29 +9,79 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTeams = void 0;
+exports.updateTeam = exports.createTeam = exports.getTeams = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getTeams = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const teams = yield prisma.team.findMany();
-        const teamsWithUsernames = yield Promise.all(teams.map((team) => __awaiter(void 0, void 0, void 0, function* () {
-            const productOwner = yield prisma.user.findUnique({
-                where: { userId: team.productOwnerUserId },
-                select: { username: true },
-            });
-            const projectManager = yield prisma.user.findUnique({
-                where: { userId: team.projectManagerUserId },
-                select: { username: true },
-            });
-            return Object.assign(Object.assign({}, team), { productOwnerUsername: productOwner === null || productOwner === void 0 ? void 0 : productOwner.username, projectManagerUsername: projectManager === null || projectManager === void 0 ? void 0 : projectManager.username });
-        })));
-        res.json(teamsWithUsernames);
+        const teams = yield prisma.team.findMany({
+            include: {
+                productOwner: true,
+                projectManager: true,
+                members: true,
+            },
+        });
+        res.json(teams);
     }
     catch (error) {
-        res
-            .status(500)
-            .json({ message: `Error retrieving Teams: ${error.message}` });
+        console.error("Error getting teams:", error);
+        res.status(500).json({ message: "Error getting teams" });
     }
 });
 exports.getTeams = getTeams;
+const createTeam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { teamName, productOwnerUserId, projectManagerUserId } = req.body;
+        if (!teamName) {
+            res.status(400).json({ message: "Team name is required" });
+            return;
+        }
+        const team = yield prisma.team.create({
+            data: {
+                teamName,
+                productOwnerUserId: productOwnerUserId || null,
+                projectManagerUserId: projectManagerUserId || null,
+            },
+            include: {
+                productOwner: true,
+                projectManager: true,
+                members: true,
+            },
+        });
+        res.status(201).json(team);
+    }
+    catch (error) {
+        console.error("Error creating team:", error);
+        res.status(500).json({ message: "Error creating team" });
+    }
+});
+exports.createTeam = createTeam;
+const updateTeam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { teamName, productOwnerUserId, projectManagerUserId } = req.body;
+        if (!teamName) {
+            res.status(400).json({ message: "Team name is required" });
+            return;
+        }
+        const team = yield prisma.team.update({
+            where: { id: Number(id) },
+            data: {
+                teamName,
+                productOwnerUserId: productOwnerUserId || null,
+                projectManagerUserId: projectManagerUserId || null,
+            },
+            include: {
+                productOwner: true,
+                projectManager: true,
+                members: true,
+            },
+        });
+        res.json(team);
+    }
+    catch (error) {
+        console.error("Error updating team:", error);
+        res.status(500).json({ message: "Error updating team" });
+    }
+});
+exports.updateTeam = updateTeam;

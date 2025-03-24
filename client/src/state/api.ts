@@ -179,6 +179,22 @@ export const api = createApi({
       query: () => "teams",
       providesTags: ["Teams"],
     }),
+    createTeam: build.mutation<Team, Partial<Team>>({
+      query: (team) => ({
+        url: "teams",
+        method: "POST",
+        body: team,
+      }),
+      invalidatesTags: ["Teams"],
+    }),
+    updateTeam: build.mutation<Team, { id: number; team: Partial<Team> }>({
+      query: ({ id, team }) => ({
+        url: `teams/${id}`,
+        method: "PATCH",
+        body: team,
+      }),
+      invalidatesTags: ["Teams"],
+    }),
     search: build.query<SearchResults, string>({
       query: (query) => `search?query=${query}`,
     }),
@@ -197,4 +213,6 @@ export const {
   useGetTeamsQuery,
   useGetTasksByUserQuery,
   useGetAuthUserQuery,
+  useCreateTeamMutation,
+  useUpdateTeamMutation,
 } = api;

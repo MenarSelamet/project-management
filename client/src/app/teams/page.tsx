@@ -1,5 +1,5 @@
 "use client";
-import { Team, User, useGetTeamsQuery, useGetUsersQuery } from "@/state/api";
+import { Team, User, useGetTeamsQuery, useGetUsersQuery, useCreateTeamMutation, useUpdateTeamMutation } from "@/state/api";
 import React from "react";
 import { useAppSelector } from "../redux";
 import Header from "@/components/Header";
@@ -39,12 +39,15 @@ interface TeamModalProps {
 const TeamModal = ({ open, onClose, team, mode }: TeamModalProps) => {
   const isCreate = mode === 'create';
   const title = isCreate ? 'Create New Team' : `Edit Team: ${team?.teamName}`;
-  const { data: users, isLoading: isLoadingUsers } = useGetUsersQuery();
+  const { data: users } = useGetUsersQuery();
+  const [createTeam, { isLoading: isCreating }] = useCreateTeamMutation();
+  const [updateTeam, { isLoading: isUpdating }] = useUpdateTeamMutation();
   
   const [teamName, setTeamName] = React.useState(team?.teamName || '');
   const [productOwner, setProductOwner] = React.useState<User | null>(team?.productOwner || null);
   const [projectManager, setProjectManager] = React.useState<User | null>(team?.projectManager || null);
   const [teamMembers, setTeamMembers] = React.useState<User[]>(team?.members || []);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (team) {
@@ -52,8 +55,45 @@ const TeamModal = ({ open, onClose, team, mode }: TeamModalProps) => {
       setProductOwner(team.productOwner || null);
       setProjectManager(team.projectManager || null);
       setTeamMembers(team.members || []);
+    } else {
+      setTeamName('');
+      setProductOwner(null);
+      setProjectManager(null);
+      setTeamMembers([]);
     }
+    setError(null);
   }, [team]);
+
+  const handleSubmit = async () => {
+    try {
+      if (!teamName.trim()) {
+        setError('Team name is required');
+        return;
+      }
+
+      const teamData: Partial<Team> = {
+        teamName: teamName.trim(),
+        productOwnerUserId: productOwner?.userId,
+        projectManagerUserId: projectManager?.userId,
+      };
+
+      console.log('Submitting team data:', teamData);
+
+      if (isCreate) {
+        const result = await createTeam(teamData).unwrap();
+        console.log('Create team result:', result);
+      } else if (team?.id) {
+        const result = await updateTeam({ id: team.id, team: teamData }).unwrap();
+        console.log('Update team result:', result);
+      }
+
+      onClose();
+    } catch (error: unknown) {
+      const err = error as { data?: { message?: string } };
+      console.error('Error details:', err);
+      setError(err?.data?.message || 'Failed to save team. Please try again.');
+    }
+  };
 
   if (!users) return null;
   
@@ -61,96 +101,63 @@ const TeamModal = ({ open, onClose, team, mode }: TeamModalProps) => {
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <div className="flex flex-col gap-4 py-4">
+        <div className="flex flex-col gap-4 mt-4">
           <TextField
             label="Team Name"
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
+            required
+            error={!!error && !teamName.trim()}
+            helperText={error && !teamName.trim() ? error : ''}
             fullWidth
-            placeholder="Enter team name"
           />
           <Autocomplete
             options={users}
-            getOptionLabel={(user) => user.username}
             value={productOwner}
             onChange={(_, newValue) => setProductOwner(newValue)}
-            loading={isLoadingUsers}
+            getOptionLabel={(option) => option.username}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Product Owner"
-                placeholder="Select product owner"
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <React.Fragment>
-                      {isLoadingUsers ? (
-                        <CircularProgress color="inherit" size={20} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </React.Fragment>
-                  ),
-                }}
-              />
+              <TextField {...params} label="Product Owner" />
             )}
+            fullWidth
           />
           <Autocomplete
             options={users}
-            getOptionLabel={(user) => user.username}
             value={projectManager}
             onChange={(_, newValue) => setProjectManager(newValue)}
-            loading={isLoadingUsers}
+            getOptionLabel={(option) => option.username}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Project Manager"
-                placeholder="Select project manager"
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <React.Fragment>
-                      {isLoadingUsers ? (
-                        <CircularProgress color="inherit" size={20} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </React.Fragment>
-                  ),
-                }}
-              />
+              <TextField {...params} label="Project Manager" />
             )}
+            fullWidth
           />
           <Autocomplete
             multiple
             options={users}
-            getOptionLabel={(user) => user.username}
             value={teamMembers}
             onChange={(_, newValue) => setTeamMembers(newValue)}
-            loading={isLoadingUsers}
+            getOptionLabel={(option) => option.username}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Team Members"
-                placeholder="Select team members"
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <React.Fragment>
-                      {isLoadingUsers ? (
-                        <CircularProgress color="inherit" size={20} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </React.Fragment>
-                  ),
-                }}
-              />
+              <TextField {...params} label="Team Members" />
             )}
+            fullWidth
           />
         </div>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" color="primary" onClick={onClose}>
-          {isCreate ? 'Create Team' : 'Save Changes'}
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          disabled={isCreating || isUpdating}
+        >
+          {isCreating || isUpdating ? (
+            <CircularProgress size={24} />
+          ) : isCreate ? (
+            'Create Team'
+          ) : (
+            'Update Team'
+          )}
         </Button>
       </DialogActions>
     </Dialog>
@@ -168,39 +175,35 @@ const columns: GridColDef<TeamWithActions>[] = [
     field: "productOwner",
     headerName: "Product Owner",
     width: 200,
-    valueGetter: (params) => {
-      if (!params?.row) return "Not Assigned";
-      const team = params.row as TeamWithActions;
-      return team.productOwner?.username || "Not Assigned";
+    valueGetter: (params: { row: TeamWithActions }) => {
+      const team = params.row;
+      return team?.productOwner?.username || "Not Assigned";
     },
   },
   {
     field: "projectManager",
     headerName: "Project Manager",
     width: 200,
-    valueGetter: (params) => {
-      if (!params?.row) return "Not Assigned";
-      const team = params.row as TeamWithActions;
-      return team.projectManager?.username || "Not Assigned";
+    valueGetter: (params: { row: TeamWithActions }) => {
+      const team = params.row;
+      return team?.projectManager?.username || "Not Assigned";
     },
   },
   {
     field: "members",
     headerName: "Team Members",
     width: 300,
-    valueGetter: (params) => {
-      if (!params?.row) return "No members";
-      const team = params.row as TeamWithActions;
-      return team.members?.map((member: User) => member.username).join(", ") || "No members";
+    valueGetter: (params: { row: TeamWithActions }) => {
+      const team = params.row;
+      return team?.members?.map((member: User) => member.username).join(", ") || "No members";
     },
   },
   {
     field: "actions",
     headerName: "Actions",
     width: 100,
-    renderCell: (params) => {
-      if (!params?.row) return null;
-      const team = params.row as TeamWithActions;
+    renderCell: (params: { row: TeamWithActions }) => {
+      const team = params.row;
       return (
         <Button
           variant="outlined"

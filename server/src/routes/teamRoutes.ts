@@ -1,8 +1,10 @@
-import { Router } from "express";
-import { getTeams } from "./../controllers/teamController";
+import express from "express";
+import { getTeams, createTeam, updateTeam } from "../controllers/teamController";
 
-const router = Router();
+const router = express.Router();
 
 router.get("/", getTeams);
+router.post("/", createTeam);
+router.patch("/:id", updateTeam);
 
 export default router;

@@ -21,12 +21,15 @@ model User {
   profilePictureUrl String?
   teamId            Int?
 
-  authoredTasks   Task[]           @relation("TaskAuthor")
-  assignedTasks   Task[]           @relation("TaskAssignee")
-  taskAssignments TaskAssignment[]
-  attachments     Attachment[]
-  comments        Comment[]
-  team            Team?            @relation(fields: [teamId], references: [id])
+  authoredTasks       Task[]           @relation("TaskAuthor")
+  assignedTasks       Task[]           @relation("TaskAssignee")
+  taskAssignments     TaskAssignment[]
+  attachments         Attachment[]
+  comments            Comment[]
+  managedTeams        Team[]           @relation("ProjectManager")
+  ownedTeams          Team[]           @relation("ProductOwner")
+  memberOfTeams       Team[]           @relation("TeamMembers")
+  team                Team?            @relation(fields: [teamId], references: [id])
 }
 
 model Team {
@@ -34,7 +37,10 @@ model Team {
   teamName             String
   productOwnerUserId   Int?
   projectManagerUserId Int?
+  productOwner         User?         @relation("ProductOwner", fields: [productOwnerUserId], references: [userId])
+  projectManager       User?         @relation("ProjectManager", fields: [projectManagerUserId], references: [userId])
   projectTeams         ProjectTeam[]
+  members              User[]        @relation("TeamMembers")
   user                 User[]
 }
 
