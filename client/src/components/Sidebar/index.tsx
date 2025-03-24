@@ -46,8 +46,8 @@ const Sidebar = () => {
   if (!currentUser) return null;
   const currentUserDetails = currentUser?.userDetails;
 
-  const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl
-    transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white
+  const sidebarClassNames = `fixed flex flex-col h-screen top-0 justify-between shadow-xl
+    transition-all duration-300 z-[60] overflow-y-auto bg-gray-800/90 backdrop-blur-sm
     ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}
   `;
 
@@ -93,8 +93,8 @@ const Sidebar = () => {
     <div className={sidebarClassNames}>
       <div className="flex h-[100%] w-full flex-col justify-start">
         {/* TOP LOGO */}
-        <div className="z-50 flex min-h-[56px] w-64 items-center justify-between bg-white px-6 pt-3 dark:bg-black">
-          <div className="text-xl font-bold text-gray-800 dark:text-white">
+        <div className="z-50  flex min-h-[56px] w-64 items-center justify-between bg-gray-800/90 backdrop-blur-sm px-6 pt-3">
+          <div className="text-xl font-bold text-white">
             Projects
           </div>
           {isSidebarCollapsed ? null : (
@@ -104,7 +104,7 @@ const Sidebar = () => {
                 dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
               }}
             >
-              <X className="h-6 w-6 text-gray-800 hover:text-gray-500 dark:text-white" />
+              <X className="h-6 w-6 text-white hover:text-gray-500" />
             </button>
           )}
         </div>
@@ -119,14 +119,14 @@ const Sidebar = () => {
               className="rounded-full object-cover"
             />
           ) : (
-            <User className="h-10 w-10 cursor-pointer self-center rounded-full p-1 border-2 dark:text-white" />
+            <User className="h-10 w-10 cursor-pointer self-center rounded-full p-1 border-2 text-white" />
           )}
           <div>
-            <h3 className="text-md font-bold tracking-wide dark:text-gray-200">
+            <h3 className="text-md font-bold tracking-wide text-white">
               Welcome {currentUserDetails?.username || currentUser?.user?.username || 'User'}
             </h3>
             <div className="mt-1 flex items-start gap-2">
-              <LockIcon className="mt-[0.1rem] h-3 w-3 text-gray-500 dark:text-gray-400" />
+              <LockIcon className="mt-[0.1rem] h-3 w-3 text-gray-500" />
               <p className="text-xs text-gray-500">Private</p>
             </div>
           </div>
@@ -141,7 +141,7 @@ const Sidebar = () => {
         {/* PRIORITIES LINKS */}
         <button
           onClick={() => setShowPriority((prev) => !prev)}
-          className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
+          className="flex w-full items-center justify-between px-8 py-3 text-white"
         >
           <span className="">Priority</span>
           {showPriority ? (
@@ -176,7 +176,7 @@ const Sidebar = () => {
           </>
         )}
       </div>
-      <div className="z-10 mt-32 flex w-full flex-col items-center gap-4 bg-white px-8 py-4 md:hidden dark:bg-black">
+      <div className="z-10 mt-32 flex w-full flex-col items-center gap-4 bg-gray-400 px-8 py-4 md:hidden">
         <div className="flex w-full items-center">
           <div className="align-center flex h-9 w-9 justify-center">
             {!!currentUserDetails?.profilePictureUrl ? (
@@ -188,10 +188,10 @@ const Sidebar = () => {
                 className="h-full rounded-full object-cover"
               />
             ) : (
-              <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
+              <User className="h-6 w-6 cursor-pointer self-center rounded-full text-white" />
             )}
           </div>
-          <span className="mx-3 text-gray-800 dark:text-white">
+          <span className="mx-3 text-white">
             {currentUserDetails?.username}
           </span>
           <button
@@ -220,16 +220,16 @@ const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
   return (
     <Link href={href} className="w-full">
       <div
-        className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 ${
-          isActive ? "bg-gray-100 text-white dark:bg-gray-600" : ""
+        className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-500 dark:bg-black dark:hover:bg-gray-700 ${
+          isActive ? "bg-gray-500 text-white" : ""
         } justify-start px-8 py-3`}
       >
         {isActive && (
           <div className="absolute top-0 left-0 h-[100%] w-[5px] bg-blue-200" />
         )}
 
-        <Icon className="h-6 w-6 text-gray-800 dark:text-gray-100" />
-        <span className={`font-medium text-gray-800 dark:text-gray-100`}>
+        <Icon className="h-6 w-6 text-white" />
+        <span className={`font-medium text-white`}>
           {label}
         </span>
       </div>

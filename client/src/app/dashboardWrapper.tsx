@@ -24,7 +24,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="flex min-h-screen w-full bg-gray-50 text-gray-900">
       <Sidebar />
       <main
-        className={`dark:bg-dark-bg flex w-full flex-col bg-gray-50 ${
+        className={`dark:bg-dark-bg flex w-full flex-col bg-gray-50 pt-16 ${
           isSidebarCollapsed ? "" : "md:pl-64"
         }`}
       >
