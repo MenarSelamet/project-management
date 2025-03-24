@@ -110,12 +110,17 @@ const Sidebar = () => {
         </div>
         {/* TEAM */}
         <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
-          <Image
-            src="https://pms3images-ms.s3.us-east-1.amazonaws.com/logo.png"
-            alt="Logo"
-            width={40}
-            height={40}
-          />
+          {!!currentUserDetails?.profilePictureUrl ? (
+            <Image
+              src={`https://pms3images-ms.s3.us-east-1.amazonaws.com/${currentUserDetails?.profilePictureUrl}`}
+              alt={currentUserDetails?.username || "User Profile Picture"}
+              width={40}
+              height={40}
+              className="rounded-full object-cover"
+            />
+          ) : (
+            <User className="h-10 w-10 cursor-pointer self-center rounded-full p-1 border-2 dark:text-white" />
+          )}
           <div>
             <h3 className="text-md font-bold tracking-wide dark:text-gray-200">
               Welcome {currentUserDetails?.username || currentUser?.user?.username || 'User'}
