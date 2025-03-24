@@ -36,11 +36,12 @@ const taskColumns: GridColDef[] = [
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const HomePage = () => {
+  const [selectedProjectId, setSelectedProjectId] = React.useState<number>(1);
   const {
     data: tasks,
     isLoading: tasksLoading,
     isError: tasksError,
-  } = useGetTasksQuery({ projectId: parseInt("1") });
+  } = useGetTasksQuery({ projectId: selectedProjectId });
   const { data: projects, isLoading: isProjectsLoading } =
     useGetProjectsQuery();
 
@@ -48,6 +49,8 @@ const HomePage = () => {
 
   if (tasksLoading || isProjectsLoading) return <div>Loading..</div>;
   if (tasksError || !tasks || !projects) return <div>Error fetching data</div>;
+
+  const selectedProject = projects.find((p) => p.id === selectedProjectId);
 
   const priorityCount = tasks.reduce(
     (acc: Record<string, number>, task: Task) => {
@@ -93,7 +96,20 @@ const HomePage = () => {
 
   return (
     <div className="container h-full w-[100%] bg-transparent p-8">
-      <Header name="Project Management Dashboard" />
+      <div className="flex items-center justify-between">
+        <Header name={`Project: ${selectedProject?.name || 'Select a Project'}`} />
+        <select
+          value={selectedProjectId}
+          onChange={(e) => setSelectedProjectId(Number(e.target.value))}
+          className="rounded-md border border-gray-300 bg-white px-4 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+        >
+          {projects.map((project) => (
+            <option key={project.id} value={project.id}>
+              {project.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="dark:bg-dark-secondary rounded-lg bg-white p-4 shadow">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
@@ -139,7 +155,7 @@ const HomePage = () => {
         </div>
         <div className="dark:bg-dark-secondary rounded-lg bg-white p-4 shadow md:col-span-2">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
-            Your Tasks
+            Project Tasks
           </h3>
           <div style={{ height: 400, width: "100%" }}>
             <DataGrid
