@@ -9,6 +9,7 @@ import {
   Briefcase,
   ChevronDown,
   ChevronUp,
+  FolderKanban,
   Home,
   Layers3,
   LockIcon,
@@ -57,6 +58,39 @@ const Sidebar = () => {
     ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}
   `;
 
+  const sidebarLinks = [
+    {
+      title: "Home",
+      href: "/",
+      icon: Home,
+    },
+    {
+      title: "Teams",
+      href: "/teams",
+      icon: Users,
+    },
+    {
+      title: "Projects",
+      href: "/projects",
+      icon: FolderKanban,
+    },
+    {
+      title: "Timeline",
+      href: "/timeline",
+      icon: Briefcase,
+    },
+    {
+      title: "Search",
+      href: "/search",
+      icon: Search,
+    },
+    {
+      title: "Profile",
+      href: "/profile",
+      icon: User,
+    },
+  ];
+
   return (
     <div className={sidebarClassNames}>
       <div className="flex h-[100%] w-full flex-col justify-start">
@@ -96,11 +130,9 @@ const Sidebar = () => {
         </div>
         {/* NAVBAR LINKS */}
         <nav className="z-10 w-full">
-          <SidebarLink icon={Home} label="Home" href="/" />
-          <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
-          <SidebarLink icon={Search} label="Search" href="/search" />
-          <SidebarLink icon={User} label="Profile" href="/profile" />
-          <SidebarLink icon={Users} label="Teams" href="/teams" />
+          {sidebarLinks.map((link) => (
+            <SidebarLink key={link.title} icon={link.icon} label={link.title} href={link.href} />
+          ))}
         </nav>
 
         {/* PROJECTS LINKS */}

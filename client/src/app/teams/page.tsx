@@ -41,7 +41,7 @@ interface TeamModalProps {
 
 const TeamModal = ({ open, onClose, team, mode }: TeamModalProps) => {
   const isCreate = mode === 'create';
-  const title = isCreate ? 'Create New Team' : `Edit Team: ${team?.teamName}`;
+  const title = isCreate ? 'Add New Team' : `Edit Team: ${team?.teamName}`;
   const { data: users } = useGetUsersQuery();
   const [createTeam, { isLoading: isCreating }] = useCreateTeamMutation();
   const [updateTeam, { isLoading: isUpdating }] = useUpdateTeamMutation();
@@ -157,7 +157,7 @@ const TeamModal = ({ open, onClose, team, mode }: TeamModalProps) => {
           {isCreating || isUpdating ? (
             <CircularProgress size={24} />
           ) : isCreate ? (
-            'Create Team'
+            'Add Team'
           ) : (
             'Update Team'
           )}
@@ -294,7 +294,7 @@ const Teams = () => {
           onClick={() => setIsCreateModalOpen(true)}
           className="h-10"
         >
-          Create Team
+          Add Team
         </Button>
       </div>
       <div style={{ height: 650, width: "100%" }}>

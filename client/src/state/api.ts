@@ -7,6 +7,8 @@ export interface Project {
   description?: string;
   startDate?: string;
   endDate?: string;
+  imageUrl?: string;
+  teams?: Team[];
 }
 
 export enum Priority {
@@ -99,7 +101,7 @@ export const api = createApi({
     },
   }),
   reducerPath: "api",
-  tagTypes: ["Projects", "Tasks", "Users", "Teams"],
+  tagTypes: ["Projects", "Tasks", "Users", "Teams", "Project"],
   endpoints: (build) => ({
     getAuthUser: build.query({
       queryFn: async (_, _queryApi, _extraoptions, fetchWithBQ) => {
@@ -122,7 +124,7 @@ export const api = createApi({
     }),
     getProjects: build.query<Project[], void>({
       query: () => "projects",
-      providesTags: ["Projects"],
+      providesTags: ["Project"],
     }),
     createProject: build.mutation<Project, Partial<Project>>({
       query: (project) => ({
@@ -130,14 +132,22 @@ export const api = createApi({
         method: "POST",
         body: project,
       }),
-      invalidatesTags: ["Projects"],
+      invalidatesTags: ["Project"],
     }),
-    deleteProject: build.mutation<{ message: string }, string>({
+    updateProject: build.mutation<Project, { id: number; project: Partial<Project> }>({
+      query: ({ id, project }) => ({
+        url: `projects/${id}`,
+        method: "PUT",
+        body: project,
+      }),
+      invalidatesTags: ["Project"],
+    }),
+    deleteProject: build.mutation<void, number>({
       query: (id) => ({
         url: `projects/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Projects"],
+      invalidatesTags: ["Project"],
     }),
     getTasks: build.query<Task[], { projectId: number }>({
       query: ({ projectId }) => `tasks?projectId=${projectId}&include=assignee`,
@@ -211,6 +221,7 @@ export const api = createApi({
 export const {
   useGetProjectsQuery,
   useCreateProjectMutation,
+  useUpdateProjectMutation,
   useDeleteProjectMutation,
   useGetTasksQuery,
   useCreateTaskMutation,
