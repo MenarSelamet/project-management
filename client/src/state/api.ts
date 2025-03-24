@@ -195,6 +195,13 @@ export const api = createApi({
       }),
       invalidatesTags: ["Teams"],
     }),
+    deleteTeam: build.mutation<Team, number>({
+      query: (id) => ({
+        url: `teams/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Teams"],
+    }),
     search: build.query<SearchResults, string>({
       query: (query) => `search?query=${query}`,
     }),
@@ -215,4 +222,5 @@ export const {
   useGetAuthUserQuery,
   useCreateTeamMutation,
   useUpdateTeamMutation,
+  useDeleteTeamMutation,
 } = api;

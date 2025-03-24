@@ -9,4 +9,5 @@ const router = express_1.default.Router();
 router.get("/", teamController_1.getTeams);
 router.post("/", teamController_1.createTeam);
 router.patch("/:id", teamController_1.updateTeam);
+router.delete("/:id", teamController_1.deleteTeam);
 exports.default = router;

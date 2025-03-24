@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateTeam = exports.createTeam = exports.getTeams = void 0;
+exports.deleteTeam = exports.updateTeam = exports.createTeam = exports.getTeams = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getTeams = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -36,12 +36,27 @@ const createTeam = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             res.status(400).json({ message: "Team name is required" });
             return;
         }
+        // Validate that users exist if IDs are provided
+        if (productOwnerUserId) {
+            const productOwner = yield prisma.user.findUnique({
+                where: { userId: productOwnerUserId },
+            });
+            if (!productOwner) {
+                res.status(400).json({ message: "Product owner not found" });
+                return;
+            }
+        }
+        if (projectManagerUserId) {
+            const projectManager = yield prisma.user.findUnique({
+                where: { userId: projectManagerUserId },
+            });
+            if (!projectManager) {
+                res.status(400).json({ message: "Project manager not found" });
+                return;
+            }
+        }
         const team = yield prisma.team.create({
-            data: {
-                teamName,
-                productOwnerUserId: productOwnerUserId || null,
-                projectManagerUserId: projectManagerUserId || null,
-            },
+            data: Object.assign(Object.assign({ teamName }, (productOwnerUserId ? { productOwnerUserId } : {})), (projectManagerUserId ? { projectManagerUserId } : {})),
             include: {
                 productOwner: true,
                 projectManager: true,
@@ -64,13 +79,28 @@ const updateTeam = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             res.status(400).json({ message: "Team name is required" });
             return;
         }
+        // Validate that users exist if IDs are provided
+        if (productOwnerUserId) {
+            const productOwner = yield prisma.user.findUnique({
+                where: { userId: productOwnerUserId },
+            });
+            if (!productOwner) {
+                res.status(400).json({ message: "Product owner not found" });
+                return;
+            }
+        }
+        if (projectManagerUserId) {
+            const projectManager = yield prisma.user.findUnique({
+                where: { userId: projectManagerUserId },
+            });
+            if (!projectManager) {
+                res.status(400).json({ message: "Project manager not found" });
+                return;
+            }
+        }
         const team = yield prisma.team.update({
             where: { id: Number(id) },
-            data: {
-                teamName,
-                productOwnerUserId: productOwnerUserId || null,
-                projectManagerUserId: projectManagerUserId || null,
-            },
+            data: Object.assign(Object.assign({ teamName }, (productOwnerUserId !== undefined ? { productOwnerUserId } : {})), (projectManagerUserId !== undefined ? { projectManagerUserId } : {})),
             include: {
                 productOwner: true,
                 projectManager: true,
@@ -85,3 +115,17 @@ const updateTeam = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updateTeam = updateTeam;
+const deleteTeam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const team = yield prisma.team.delete({
+            where: { id: Number(id) },
+        });
+        res.json(team);
+    }
+    catch (error) {
+        console.error("Error deleting team:", error);
+        res.status(500).json({ message: "Error deleting team" });
+    }
+});
+exports.deleteTeam = deleteTeam;

@@ -1,5 +1,5 @@
 "use client";
-import { Team, User, useGetTeamsQuery, useGetUsersQuery, useCreateTeamMutation, useUpdateTeamMutation } from "@/state/api";
+import { Team, User, useGetTeamsQuery, useGetUsersQuery, useCreateTeamMutation, useUpdateTeamMutation, useDeleteTeamMutation } from "@/state/api";
 import React from "react";
 import { useAppSelector } from "../redux";
 import Header from "@/components/Header";
@@ -19,8 +19,11 @@ import {
   DialogContent, 
   DialogTitle, 
   TextField,
-  CircularProgress
+  CircularProgress,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
+import { Pencil, Trash } from "lucide-react";
 
 const CustomToolbar = () => (
   <GridToolbarContainer className="toolbar flex gap-2">
@@ -73,8 +76,8 @@ const TeamModal = ({ open, onClose, team, mode }: TeamModalProps) => {
 
       const teamData: Partial<Team> = {
         teamName: teamName.trim(),
-        productOwnerUserId: productOwner?.userId,
-        projectManagerUserId: projectManager?.userId,
+        productOwnerUserId: productOwner?.userId || undefined,
+        projectManagerUserId: projectManager?.userId || undefined,
       };
 
       console.log('Submitting team data:', teamData);
@@ -166,6 +169,7 @@ const TeamModal = ({ open, onClose, team, mode }: TeamModalProps) => {
 
 interface TeamWithActions extends Team {
   onEdit: (team: Team) => void;
+  onDelete: (team: Team) => void;
 }
 
 const columns: GridColDef<TeamWithActions>[] = [
@@ -202,19 +206,44 @@ const columns: GridColDef<TeamWithActions>[] = [
     field: "actions",
     headerName: "Actions",
     width: 100,
+    align: 'center',
+    headerAlign: 'center',
     renderCell: (params: { row: TeamWithActions }) => {
       const team = params.row;
       return (
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            team.onEdit(team);
-          }}
-        >
-          Edit
-        </Button>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          width: '100%',
+          height: '100%'
+        }}>
+          <Tooltip title="Edit Team">
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                team.onEdit(team);
+              }}
+              sx={{ padding: '4px' }}
+            >
+              <Pencil className="h-4 w-4" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete Team">
+            <IconButton
+              size="small"
+              color="error"
+              onClick={(e) => {
+                e.stopPropagation();
+                team.onDelete(team);
+              }}
+              sx={{ padding: '4px', marginLeft: '8px' }}
+            >
+              <Trash className="h-4 w-4" />
+            </IconButton>
+          </Tooltip>
+        </div>
       );
     },
   },
@@ -225,13 +254,34 @@ const Teams = () => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const [editingTeam, setEditingTeam] = React.useState<Team | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
+  const [deleteTeam] = useDeleteTeamMutation();
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
+  const [teamToDelete, setTeamToDelete] = React.useState<Team | null>(null);
 
   if (isLoading) return <div>Loading...</div>;
   if (isError || !teams) return <div>Error fetching teams</div>;
 
+  const handleDelete = async (team: Team) => {
+    setTeamToDelete(team);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (teamToDelete) {
+      try {
+        await deleteTeam(teamToDelete.id);
+        setShowDeleteConfirm(false);
+        setTeamToDelete(null);
+      } catch (error) {
+        console.error('Error deleting team:', error);
+      }
+    }
+  };
+
   const teamsWithActions = teams.map(team => ({
     ...team,
     onEdit: (team: Team) => setEditingTeam(team),
+    onDelete: (team: Team) => handleDelete(team),
   }));
 
   return (
@@ -270,6 +320,20 @@ const Teams = () => {
         onClose={() => setIsCreateModalOpen(false)}
         mode="create"
       />
+      <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
+        <DialogTitle>Delete Team</DialogTitle>
+        <DialogContent>
+          <div className="mt-4">
+            Are you sure you want to delete team &quot;{teamToDelete?.teamName}&quot;? This action cannot be undone.
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
