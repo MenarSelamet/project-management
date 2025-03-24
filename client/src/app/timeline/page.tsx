@@ -3,11 +3,10 @@
 import { useAppSelector } from "@/app/redux";
 import Header from "@/components/Header";
 import { useGetProjectsQuery } from "@/state/api";
-import { DisplayOption, Gantt, ViewMode } from "gantt-task-react";
+import { DisplayOption, Gantt, Task, ViewMode } from "gantt-task-react";
+import type { TaskType } from "gantt-task-react/dist/types/public-types";
 import "gantt-task-react/dist/index.css";
-import React, { useState } from "react";
-
-type TaskTypeItems = "task" | "milestone" | "project";
+import React, { useState, useMemo } from "react";
 
 const Timeline = () => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
@@ -18,21 +17,43 @@ const Timeline = () => {
     locale: "en-US",
   });
 
- const ganttTasks = projects
-   ? projects.map((project) => ({
-       start: new Date(project.startDate as string),
-       end: new Date(project.endDate as string),
-       name: project.name,
-       id: `Project-${project.id}`,
-       type: "project" as TaskTypeItems,
-       progress: 50,
-       isDisabled: false,
-     }))
-   : [];
+  const ganttTasks = useMemo(() => {
+    if (!projects || !Array.isArray(projects)) {
+      console.log("Projects data:", projects);
+      return [];
+    }
 
-  const handleViewModeChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
+    return projects
+      .filter((project): project is typeof project & { startDate: string; endDate: string } => {
+        if (!project?.startDate || !project?.endDate) {
+          console.log("Filtered out project due to missing dates:", project);
+          return false;
+        }
+        try {
+          const start = new Date(project.startDate);
+          const end = new Date(project.endDate);
+          if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            console.log("Invalid date format for project:", project);
+            return false;
+          }
+          return true;
+        } catch (error) {
+          console.error("Error parsing dates for project:", project, error);
+          return false;
+        }
+      })
+      .map((project): Task => ({
+        start: new Date(project.startDate),
+        end: new Date(project.endDate),
+        name: project.name || "Untitled Project",
+        id: `Project-${project.id}`,
+        type: "project" as TaskType,
+        progress: 50,
+        isDisabled: false,
+      }));
+  }, [projects]);
+
+  const handleViewModeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setDisplayOptions((prev) => ({
       ...prev,
       viewMode: event.target.value as ViewMode,
@@ -40,8 +61,9 @@ const Timeline = () => {
   };
 
   if (isLoading) return <div>Loading...</div>;
-  if (isError || !projects)
-    return <div>An error occurred while fetching projects</div>;
+  if (isError) return <div>An error occurred while fetching projects</div>;
+  if (!projects) return <div>No projects found</div>;
+  if (ganttTasks.length === 0) return <div>No projects with valid dates found</div>;
 
   return (
     <div className="max-w-full p-8">
@@ -62,15 +84,17 @@ const Timeline = () => {
 
       <div className="dark:bg-dark-secondary overflow-hidden rounded-md bg-white shadow dark:text-white">
         <div className="timeline">
-          <Gantt
-            tasks={ganttTasks}
-            {...displayOptions}
-            columnWidth={displayOptions.viewMode === ViewMode.Month ? 150 : 100}
-            listCellWidth="100px"
-            projectBackgroundColor={isDarkMode ? "#101214" : "#1f2937"}
-            projectProgressColor={isDarkMode ? "#1f2937" : "#aeb8c2"}
-            projectProgressSelectedColor={isDarkMode ? "#000" : "#9ba1a6"}
-          />
+          {ganttTasks.length > 0 && (
+            <Gantt
+              tasks={ganttTasks}
+              {...displayOptions}
+              columnWidth={displayOptions.viewMode === ViewMode.Month ? 150 : 100}
+              listCellWidth="100px"
+              projectBackgroundColor={isDarkMode ? "#101214" : "#1f2937"}
+              projectProgressColor={isDarkMode ? "#1f2937" : "#aeb8c2"}
+              projectProgressSelectedColor={isDarkMode ? "#000" : "#9ba1a6"}
+            />
+          )}
         </div>
       </div>
     </div>
