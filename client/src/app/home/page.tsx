@@ -9,7 +9,7 @@ import {
 } from "@/state/api";
 import React from "react";
 import { useAppSelector } from "../redux";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import Header from "@/components/Header";
 import {
   Bar,
@@ -35,7 +35,7 @@ const taskColumns: GridColDef[] = [
     field: "assignee",
     headerName: "Assigned To",
     width: 180,
-    valueGetter: (params) => {
+    valueGetter: (params: GridRenderCellParams) => {
       const task = params.row as Task;
       return task?.assignee?.username || "Unassigned";
     },
@@ -67,7 +67,7 @@ const HomePage = () => {
       acc[priority as Priority] = (acc[priority as Priority] || 0) + 1;
       return acc;
     },
-    {},
+    {}
   );
 
   const taskDistribution = Object.keys(priorityCount).map((key) => ({
@@ -81,7 +81,7 @@ const HomePage = () => {
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     },
-    {},
+    {}
   );
 
   const projectStatus = Object.keys(statusCount).map((key) => ({
@@ -106,7 +106,7 @@ const HomePage = () => {
   return (
     <div className="container h-full w-[100%] bg-transparent p-8">
       <div className="flex items-center justify-between">
-        <Header name={`Project: ${selectedProject?.name || 'Select a Project'}`} />
+        <Header name={`Project: ${selectedProject?.name || "Select a Project"}`} />
         <select
           value={selectedProjectId}
           onChange={(e) => setSelectedProjectId(Number(e.target.value))}
@@ -126,18 +126,10 @@ const HomePage = () => {
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={taskDistribution}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke={chartColors.barGrid}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartColors.barGrid} />
               <XAxis dataKey="name" stroke={chartColors.text} />
               <YAxis stroke={chartColors.text} />
-              <Tooltip
-                contentStyle={{
-                  width: "min-content",
-                  height: "min-content",
-                }}
-              />
+              <Tooltip contentStyle={{ width: "min-content", height: "min-content" }} />
               <Legend />
               <Bar dataKey="count" fill={chartColors.bar} />
             </BarChart>
@@ -151,10 +143,7 @@ const HomePage = () => {
             <PieChart>
               <Pie dataKey="count" data={projectStatus} fill="#82ca9d" label>
                 {projectStatus.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip />

@@ -68,6 +68,11 @@ const Sidebar = () => {
       icon: FolderKanban,
     },
     {
+      title: "Users",
+      href: "/users",
+      icon: User,
+    },
+    {
       title: "Timeline",
       href: "/timeline",
       icon: Briefcase,
