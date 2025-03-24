@@ -1,6 +1,8 @@
+"use client";
+
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed } from "@/state";
-import { useGetAuthUserQuery, useGetProjectsQuery } from "@/state/api";
+import { useGetAuthUserQuery } from "@/state/api";
 import { signOut } from "aws-amplify/auth";
 import {
   AlertCircle,
@@ -26,13 +28,10 @@ import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 
 const Sidebar = () => {
-  const [showProjects, setShowProjects] = useState(true);
   const [showPriority, setShowPriority] = useState(true);
-
-  const { data: projects } = useGetProjectsQuery();
   const dispatch = useAppDispatch();
   const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed,
+    (state) => state.global.isSidebarCollapsed
   );
 
   const { data: currentUser } = useGetAuthUserQuery({});
@@ -43,15 +42,9 @@ const Sidebar = () => {
       console.error("Error signing out: ", error);
     }
   };
+
   if (!currentUser) return null;
   const currentUserDetails = currentUser?.userDetails;
-
-  console.log('Current user:', {
-    currentUser,
-    userDetails: currentUserDetails,
-    username: currentUserDetails?.username,
-    cognitoUsername: currentUser?.user?.username
-  }); // Detailed debug log
 
   const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl
     transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white
@@ -134,29 +127,6 @@ const Sidebar = () => {
             <SidebarLink key={link.title} icon={link.icon} label={link.title} href={link.href} />
           ))}
         </nav>
-
-        {/* PROJECTS LINKS */}
-        <button
-          onClick={() => setShowProjects((prev) => !prev)}
-          className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
-        >
-          <span className="">Projects</span>
-          {showProjects ? (
-            <ChevronUp className="h-5 w-5" />
-          ) : (
-            <ChevronDown className="h-5 w-5" />
-          )}
-        </button>
-        {/* PROJECTS LIST */}
-        {showProjects &&
-          projects?.map((project) => (
-            <SidebarLink
-              key={project.id}
-              icon={Briefcase}
-              label={project.name}
-              href={`/projects/${project.id}`}
-            />
-          ))}
 
         {/* PRIORITIES LINKS */}
         <button
