@@ -1,5 +1,5 @@
 "use client";
-import { Team, User, useGetTeamsQuery } from "@/state/api";
+import { Team, User, useGetTeamsQuery, useGetUsersQuery } from "@/state/api";
 import React from "react";
 import { useAppSelector } from "../redux";
 import Header from "@/components/Header";
@@ -11,7 +11,16 @@ import {
   GridToolbarFilterButton,
 } from "@mui/x-data-grid";
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import { 
+  Autocomplete,
+  Button, 
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogTitle, 
+  TextField,
+  CircularProgress
+} from "@mui/material";
 
 const CustomToolbar = () => (
   <GridToolbarContainer className="toolbar flex gap-2">
@@ -20,48 +29,128 @@ const CustomToolbar = () => (
   </GridToolbarContainer>
 );
 
-interface EditModalProps {
+interface TeamModalProps {
   open: boolean;
   onClose: () => void;
-  team: Team | null;
+  team?: Team | null;
+  mode: 'create' | 'edit';
 }
 
-const EditModal = ({ open, onClose, team }: EditModalProps) => {
-  if (!team) return null;
+const TeamModal = ({ open, onClose, team, mode }: TeamModalProps) => {
+  const isCreate = mode === 'create';
+  const title = isCreate ? 'Create New Team' : `Edit Team: ${team?.teamName}`;
+  const { data: users, isLoading: isLoadingUsers } = useGetUsersQuery();
+  
+  const [teamName, setTeamName] = React.useState(team?.teamName || '');
+  const [productOwner, setProductOwner] = React.useState<User | null>(team?.productOwner || null);
+  const [projectManager, setProjectManager] = React.useState<User | null>(team?.projectManager || null);
+  const [teamMembers, setTeamMembers] = React.useState<User[]>(team?.members || []);
+
+  React.useEffect(() => {
+    if (team) {
+      setTeamName(team.teamName);
+      setProductOwner(team.productOwner || null);
+      setProjectManager(team.projectManager || null);
+      setTeamMembers(team.members || []);
+    }
+  }, [team]);
+
+  if (!users) return null;
   
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Edit Team: {team.teamName}</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <div className="flex flex-col gap-4 py-4">
           <TextField
             label="Team Name"
-            defaultValue={team.teamName}
+            value={teamName}
+            onChange={(e) => setTeamName(e.target.value)}
             fullWidth
+            placeholder="Enter team name"
           />
-          <TextField
-            label="Product Owner"
-            defaultValue={team.productOwner?.username}
-            fullWidth
+          <Autocomplete
+            options={users}
+            getOptionLabel={(user) => user.username}
+            value={productOwner}
+            onChange={(_, newValue) => setProductOwner(newValue)}
+            loading={isLoadingUsers}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Product Owner"
+                placeholder="Select product owner"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <React.Fragment>
+                      {isLoadingUsers ? (
+                        <CircularProgress color="inherit" size={20} />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </React.Fragment>
+                  ),
+                }}
+              />
+            )}
           />
-          <TextField
-            label="Project Manager"
-            defaultValue={team.projectManager?.username}
-            fullWidth
+          <Autocomplete
+            options={users}
+            getOptionLabel={(user) => user.username}
+            value={projectManager}
+            onChange={(_, newValue) => setProjectManager(newValue)}
+            loading={isLoadingUsers}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Project Manager"
+                placeholder="Select project manager"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <React.Fragment>
+                      {isLoadingUsers ? (
+                        <CircularProgress color="inherit" size={20} />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </React.Fragment>
+                  ),
+                }}
+              />
+            )}
           />
-          <TextField
-            label="Team Members"
-            defaultValue={team.members?.map((m: User) => m.username).join(", ")}
-            fullWidth
-            multiline
-            rows={3}
+          <Autocomplete
+            multiple
+            options={users}
+            getOptionLabel={(user) => user.username}
+            value={teamMembers}
+            onChange={(_, newValue) => setTeamMembers(newValue)}
+            loading={isLoadingUsers}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Team Members"
+                placeholder="Select team members"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <React.Fragment>
+                      {isLoadingUsers ? (
+                        <CircularProgress color="inherit" size={20} />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </React.Fragment>
+                  ),
+                }}
+              />
+            )}
           />
         </div>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button variant="contained" color="primary" onClick={onClose}>
-          Save Changes
+          {isCreate ? 'Create Team' : 'Save Changes'}
         </Button>
       </DialogActions>
     </Dialog>
@@ -132,6 +221,7 @@ const Teams = () => {
   const { data: teams, isLoading, isError } = useGetTeamsQuery();
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const [editingTeam, setEditingTeam] = React.useState<Team | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
 
   if (isLoading) return <div>Loading...</div>;
   if (isError || !teams) return <div>Error fetching teams</div>;
@@ -143,7 +233,17 @@ const Teams = () => {
 
   return (
     <div className="flex w-full flex-col p-8">
-      <Header name="Teams" />
+      <div className="flex items-center justify-between mb-6">
+        <Header name="Teams" />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setIsCreateModalOpen(true)}
+          className="h-10"
+        >
+          Create Team
+        </Button>
+      </div>
       <div style={{ height: 650, width: "100%" }}>
         <DataGrid<TeamWithActions>
           rows={teamsWithActions}
@@ -156,10 +256,16 @@ const Teams = () => {
           sx={dataGridSxStyles(isDarkMode)}
         />
       </div>
-      <EditModal
+      <TeamModal
         open={!!editingTeam}
         onClose={() => setEditingTeam(null)}
         team={editingTeam}
+        mode="edit"
+      />
+      <TeamModal
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        mode="create"
       />
     </div>
   );
