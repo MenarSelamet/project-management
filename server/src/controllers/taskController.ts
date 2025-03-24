@@ -42,25 +42,53 @@ export const createTask = async (
     authorUserId,
     assignedUserId,
   } = req.body;
+
+  console.log("Received task creation request:", req.body);
+
   try {
+    // Validate required fields
+    if (!title || !projectId || !authorUserId) {
+      console.error("Missing required fields:", { title, projectId, authorUserId });
+      res.status(400).json({ 
+        message: "Missing required fields",
+        required: { title: !!title, projectId: !!projectId, authorUserId: !!authorUserId }
+      });
+      return;
+    }
+
+    // Ensure IDs are numbers
+    const taskData = {
+      title,
+      description,
+      status,
+      priority,
+      tags,
+      startDate,
+      dueDate,
+      points,
+      projectId: Number(projectId),
+      authorUserId: Number(authorUserId),
+      assignedUserId: assignedUserId ? Number(assignedUserId) : undefined,
+    };
+
+    console.log("Creating task with data:", taskData);
+
     const newTask = await prisma.task.create({
-      data: {
-        title,
-        description,
-        status,
-        priority,
-        tags,
-        startDate,
-        dueDate,
-        points,
-        projectId,
-        authorUserId,
-        assignedUserId,
+      data: taskData,
+      include: {
+        author: true,
+        assignee: true,
       },
     });
+
+    console.log("Task created successfully:", newTask);
     res.status(201).json(newTask);
   } catch (error: any) {
-    res.status(500).json({ message: `Error creating task ${error.message}` });
+    console.error("Error creating task:", error);
+    res.status(500).json({ 
+      message: `Error creating task: ${error.message}`,
+      error: error 
+    });
   }
 };
 
