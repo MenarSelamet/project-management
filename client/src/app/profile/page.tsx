@@ -1,13 +1,19 @@
 "use client";
 
-import { useGetAuthUserQuery } from "@/state/api";
+import { useGetAuthUserQuery, useGetTeamsQuery } from "@/state/api";
 import { User } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 const ProfilePage = () => {
-  const { data: currentUser, isLoading } = useGetAuthUserQuery({});
+  const { data: currentUser, isLoading: userLoading } = useGetAuthUserQuery({});
+  const { data: teams, isLoading: teamsLoading } = useGetTeamsQuery();
+  const [selectedTeam, setSelectedTeam] = useState("");
+  const [selectedRole, setSelectedRole] = useState("Mid");
 
-  if (isLoading) {
+  const roles = ["Senior", "Mid", "Junior", "Other"];
+
+  if (userLoading || teamsLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
@@ -59,17 +65,34 @@ const ProfilePage = () => {
                   <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Team
                   </h4>
-                  <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
-                    {currentUserDetails?.team?.name || "No team assigned"}
-                  </p>
+                  <select
+                    value={selectedTeam}
+                    onChange={(e) => setSelectedTeam(e.target.value)}
+                    className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  >
+                    <option value="">Select a team</option>
+                    {teams?.map((team) => (
+                      <option key={team.teamId} value={team.teamId}>
+                        {team.teamName}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
                   <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Role
                   </h4>
-                  <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
-                    {currentUserDetails?.role || "No role assigned"}
-                  </p>
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  >
+                    {roles.map((role) => (
+                      <option key={role} value={role}>
+                        {role}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
