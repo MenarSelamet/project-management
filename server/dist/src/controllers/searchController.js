@@ -14,26 +14,36 @@ const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const search = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query } = req.query;
+    if (!query || typeof query !== "string") {
+        res.status(400).json({ message: "Search query is required" });
+        return;
+    }
     try {
         const tasks = yield prisma.task.findMany({
             where: {
                 OR: [
-                    { title: { contains: query } },
-                    { description: { contains: query } },
+                    { title: { contains: query, mode: "insensitive" } },
+                    { description: { contains: query, mode: "insensitive" } },
                 ],
+            },
+            include: {
+                assignee: true,
+                author: true,
             },
         });
         const projects = yield prisma.project.findMany({
             where: {
                 OR: [
-                    { name: { contains: query } },
-                    { description: { contains: query } },
+                    { name: { contains: query, mode: "insensitive" } },
+                    { description: { contains: query, mode: "insensitive" } },
                 ],
             },
         });
         const users = yield prisma.user.findMany({
             where: {
-                OR: [{ username: { contains: query } }],
+                OR: [
+                    { username: { contains: query, mode: "insensitive" } },
+                ],
             },
         });
         res.json({ tasks, projects, users });
