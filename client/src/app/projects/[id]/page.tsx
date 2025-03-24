@@ -9,7 +9,7 @@ import Table from "../TableView";
 import { use } from "react";
 import ModalNewTask from "@/components/ModalNewTask";
 import ConfirmationModal from "@/components/ConfirmationModal";
-import { useDeleteProjectMutation } from "@/state/api";
+import { useDeleteProjectMutation, useGetProjectsQuery } from "@/state/api";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 
@@ -20,10 +20,13 @@ const Project = ({ params }: { params: Promise<{ id: string }> }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteProject] = useDeleteProjectMutation();
   const router = useRouter();
+  const projectId = Number(id);
+  const { data: projects } = useGetProjectsQuery();
+  const project = projects?.find(p => p.id === projectId);
 
   const handleDeleteProject = async () => {
     try {
-      await deleteProject(id);
+      await deleteProject(projectId);
       router.push("/home");
     } catch (error) {
       console.error("Error deleting project:", error);
@@ -44,7 +47,7 @@ const Project = ({ params }: { params: Promise<{ id: string }> }) => {
         title="Delete Project"
         message="Are you sure you want to delete this project? This action cannot be undone."
       />
-      <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+      <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} projectName={project?.name} />
       {activeTab === "Board" && (
         <Board id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
       )}
