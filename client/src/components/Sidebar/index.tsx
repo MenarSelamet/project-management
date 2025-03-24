@@ -1,4 +1,3 @@
-
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed } from "@/state";
 import { useGetAuthUserQuery, useGetProjectsQuery } from "@/state/api";
@@ -47,6 +46,13 @@ const Sidebar = () => {
   if (!currentUser) return null;
   const currentUserDetails = currentUser?.userDetails;
 
+  console.log('Current user:', {
+    currentUser,
+    userDetails: currentUserDetails,
+    username: currentUserDetails?.username,
+    cognitoUsername: currentUser?.user?.username
+  }); // Detailed debug log
+
   const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl
     transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white
     ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}
@@ -81,7 +87,7 @@ const Sidebar = () => {
           />
           <div>
             <h3 className="text-md font-bold tracking-wide dark:text-gray-200">
-              MENAR TEAM
+              Welcome {currentUserDetails?.username || currentUser?.user?.username || 'User'}
             </h3>
             <div className="mt-1 flex items-start gap-2">
               <LockIcon className="mt-[0.1rem] h-3 w-3 text-gray-500 dark:text-gray-400" />
