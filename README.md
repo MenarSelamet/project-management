@@ -11,7 +11,6 @@ A full-stack project management application with robust features for team collab
 - Gantt chart visualization
 - Data analytics and reporting
 - File attachments support
-- Real-time commenting system
 
 ## Tech Stack
 
@@ -19,10 +18,10 @@ A full-stack project management application with robust features for team collab
 - **Framework**: Next.js 15.2.1
 - **Language**: TypeScript
 - **State Management**: Redux
-- **UI Components**: 
+- **UI Components**:
   - Material UI
   - TailwindCSS
-- **Data Visualization**: 
+- **Data Visualization**:
   - Recharts
   - Gantt chart components
 - **Authentication**: AWS Amplify/Cognito
@@ -33,7 +32,7 @@ A full-stack project management application with robust features for team collab
 - **Language**: TypeScript
 - **Database**: PostgreSQL
 - **ORM**: Prisma
-- **Security**: 
+- **Security**:
   - Helmet middleware
   - CORS enabled
 - **Logging**: Morgan
@@ -44,14 +43,12 @@ A full-stack project management application with robust features for team collab
 - **Teams**: Collaborative groups with defined roles
 - **Projects**: Comprehensive project management
 - **Tasks**: Detailed task tracking with assignments
-- **Comments**: Task discussion system
-- **Attachments**: File management system
 
 ## Deployment
 
 The application is deployed on AWS infrastructure:
-- Frontend hosted on AWS
-- Backend services on AWS
+- Frontend hosted on AWS Amplify
+- Backend services hosted on AWS
 - Authentication handled by AWS Cognito
 - Database hosted on AWS RDS (PostgreSQL)
 
@@ -74,10 +71,26 @@ The application is deployed on AWS infrastructure:
    - Configure AWS Cognito credentials
    - Set up database connection strings
 
-4. Run the development servers:
+4. Initialize Prisma and seed the database:
+
+   ```bash
+   # Navigate to server directory
+   cd server
+
+   # Generate Prisma client
+   npx prisma generate
+
+   # Run Prisma migrations
+   npx prisma migrate dev
+
+   # Seed the database (optional)
+   npx prisma db seed
+   ```
+
+5. Run the development servers:
    ```bash
    # Start the client
-   cd client
+   cd ../client
    npm run dev
 
    # Start the server
@@ -102,4 +115,6 @@ NODE_ENV=
 AWS_REGION=
 AWS_USER_POOL_ID=
 ```
+
+
 
